@@ -1,0 +1,6 @@
+  
+name: jina-code-v2
+backend: huggingface-embeddings
+embeddings: true
+parameters:
+  model: jinaai/jina-embeddings-v2-base-code

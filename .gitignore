@@ -1,0 +1,13 @@
+# VS Code
+.vscode/
+
+# User Tasks
+tasks/
+
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Docker
+.dockerignore

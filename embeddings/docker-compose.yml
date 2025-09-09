@@ -1,0 +1,26 @@
+services:
+  jina-openai:
+    build:
+      context: ./app
+    container_name: jina-openai
+    ports:
+      - "4000:8082"
+    environment:
+      - MODEL_NAME=jinaai/jina-embeddings-v2-base-code
+      - JINA_TELEMETRY_OPTOUT=1
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost:8082/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+    restart: unless-stopped
+
+  warmup:
+    image: curlimages/curl:8.8.0
+    depends_on:
+      jina-openai:
+        condition: service_healthy
+    entrypoint: ["/bin/sh","-lc"]
+    command: >
+      sh -c 'curl -fsS -X POST http://jina-openai:8082/v1/embeddings -H "Content-Type: application/json" -d "{\"model\":\"jina-code-v2\",\"input\":[\"warmup\"]}" >/dev/null && echo warmup-ok'
+    restart: "no"
