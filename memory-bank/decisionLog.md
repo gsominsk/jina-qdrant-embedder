@@ -58,3 +58,9 @@ This file records architectural and implementation decisions using a list format
     - The service initially returned `422 Unprocessable Entity` errors, which were resolved after fixing the `docker-compose.yml` and restarting the services.
 - **Outcome:**
     - The custom embedding service was successfully built, deployed, and tested. It is now fully functional and serving embeddings as expected.
+[2025-09-14 12:54:26] - **Decision:** Implemented an `asyncio.Semaphore` with a value of 8 in `embeddings/app/app.py` to limit concurrent requests to the embedding model.
+**Rationale:** The service was crashing under heavy load due to uncontrolled memory spikes (OOM kills). Analysis showed that limiting concurrency stabilizes memory usage while maintaining high throughput. The value of 8 was calculated based on available system RAM (8GB) to balance performance and stability.
+**Implications:** The service is now stable under heavy load. The semaphore value is a critical performance tuning parameter and is documented directly in the code and `README.md`.
+[2025-09-14 17:16:15] - [Decision] Implemented explicit tensor cleanup (`del` and `torch.cuda.empty_cache()`) within the batch processing loop in `_blocking_encode` to fix the primary, critical memory leak causing timeouts.
+[2025-09-14 17:16:15] - [Decision] Added explicit deletion of `final_embeddings` and `data` objects in the `create_embeddings` endpoint, followed by `gc.collect()`, to address a slower memory leak observed during indexing.
+[2025-09-14 17:16:15] - [Decision] Implemented a global FastAPI middleware to run `gc.collect()` after every HTTP request as a more aggressive approach to clean up lingering request/response objects identified by `tracemalloc`.

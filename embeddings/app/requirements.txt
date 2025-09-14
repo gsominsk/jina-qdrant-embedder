@@ -5,5 +5,7 @@ numpy
 transformers>=4.41
 huggingface_hub>=0.23
 # Для работы с Jina Code v2 через transformers
-transformers>=4.41
 torch
+
+optimum
+psutil

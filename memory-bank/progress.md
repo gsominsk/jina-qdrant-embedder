@@ -22,3 +22,8 @@
 - Тестирование производительности
 - Документирование решения  
 [2025-09-09 20:39:03] - Created README.md with instructions on how to run and use the system.
+[2025-09-14 17:16:51] - [Task] Debug and fix memory leaks in the embeddings service.
+[2025-09-14 17:16:51] - [Progress] Identified and fixed a critical memory leak by cleaning up PyTorch tensors.
+[2025-09-14 17:16:51] - [Progress] Identified a secondary, slower memory leak related to FastAPI/Starlette request/response objects during indexing.
+[2025-09-14 17:16:51] - [Progress] Implemented two additional fixes: explicit object deletion in the endpoint and a global garbage collection middleware.
+[2025-09-14 17:16:51] - [Status] Ready for final verification test.

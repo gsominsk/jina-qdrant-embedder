@@ -21,4 +21,4 @@ RUN python -m pip install --upgrade pip && \
 COPY app.py .
 
 EXPOSE 8082
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8082"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8082", "--workers", "1"]

@@ -11,3 +11,9 @@ __pycache__/
 
 # Docker
 .dockerignore
+
+# Qdrant
+qdrant/storage/
+# Log files
+*.log
+nohup.out
