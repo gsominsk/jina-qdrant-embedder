@@ -9,6 +9,57 @@ The system consists of two main services, orchestrated with Docker Compose:
 1.  **Qdrant:** A vector database used to store and search for code embeddings. It runs in its own container and exposes its API on port `6333`.
 2.  **Embeddings Service:** A custom, lightweight FastAPI application that serves the `jina-code-v2` model. It uses the `transformers` library to generate embeddings and exposes an OpenAI-compatible API on port `4000`.
 
+## Architecture Diagram
+
+Here is a simple ASCII diagram illustrating the data flow:
+
+```
++--------------------------+
+|      Roo Code Client     |
+| (in your IDE, configured |
+| via roo-code-config.json)|
++--------------------------+
+           |
+           | 1. POST code to be embedded
+           v
++--------------------------+
+|  Custom FastAPI Service |
+|  (Docker, Port 4000)     |
+|--------------------------|
+|   |                      |
+|   | 2. Process with...   |
+|   v                      |
+| +--------------------+   |
+| | jina-code-v2 Model |   |
+| +--------------------+   |
+|   ^                      |
+|   | 3. Return vector     |
+|   |                      |
++--------------------------+
+           |
+           | 4. Return OpenAI-compatible embedding
+           v
++--------------------------+
+|      Roo Code Client     |
+| (receives embedding)     |
++--------------------------+
+           |
+           | 5. Store embedding in...
+           v
++--------------------------+
+|    Qdrant Vector DB      |
+|    (Docker, Port 6333)   |
++--------------------------+
+```
+
+### Explanation of the Flow:
+
+1.  **Roo Code to FastAPI:** Your IDE, using settings from `roo-code-config.json`, sends a code snippet to the custom FastAPI service on port `4000`.
+2.  **FastAPI to Model:** The FastAPI service (the layer) takes the code and passes it to the `jina-code-v2` model, which runs in the same container.
+3.  **Model to FastAPI:** The model converts the code into a numerical vector (the embedding) and returns it to the service.
+4.  **FastAPI to Roo Code:** The service wraps this vector in a standard JSON format and sends it back to your IDE.
+5.  **Roo Code to Qdrant:** Your IDE receives the embedding and sends it to the Qdrant database on port `6333`, where it is stored and indexed for future searches.
+
 ## How It Works
 
 1.  **Roo Code Configuration:**
@@ -263,54 +314,3 @@ After setup, you can manage the services with the following key combinations (fo
 | `⌘ + ⇧ + 7`     | `jina start + warmup`    | Start only Jina and warm up                        |
 | `⌘ + ⇧ + 6`     | `jina stop`              | Stop only Jina                                     |
 | `⌘ + ⇧ + 0`     | `help: embeddings shortcuts` | Show this help screen in the VS Code terminal      |
-
-## Architecture Diagram
-
-Here is a simple ASCII diagram illustrating the data flow:
-
-```
-+--------------------------+
-|      Roo Code Client     |
-| (in your IDE, configured |
-| via roo-code-config.json)|
-+--------------------------+
-           |
-           | 1. POST code to be embedded
-           v
-+--------------------------+
-|  Custom FastAPI Service |
-|  (Docker, Port 4000)     |
-|--------------------------|
-|   |                      |
-|   | 2. Process with...   |
-|   v                      |
-| +--------------------+   |
-| | jina-code-v2 Model |   |
-| +--------------------+   |
-|   ^                      |
-|   | 3. Return vector     |
-|   |                      |
-+--------------------------+
-           |
-           | 4. Return OpenAI-compatible embedding
-           v
-+--------------------------+
-|      Roo Code Client     |
-| (receives embedding)     |
-+--------------------------+
-           |
-           | 5. Store embedding in...
-           v
-+--------------------------+
-|    Qdrant Vector DB      |
-|    (Docker, Port 6333)   |
-+--------------------------+
-```
-
-### Explanation of the Flow:
-
-1.  **Roo Code to FastAPI:** Your IDE, using settings from `roo-code-config.json`, sends a code snippet to the custom FastAPI service on port `4000`.
-2.  **FastAPI to Model:** The FastAPI service (the layer) takes the code and passes it to the `jina-code-v2` model, which runs in the same container.
-3.  **Model to FastAPI:** The model converts the code into a numerical vector (the embedding) and returns it to the service.
-4.  **FastAPI to Roo Code:** The service wraps this vector in a standard JSON format and sends it back to your IDE.
-5.  **Roo Code to Qdrant:** Your IDE receives the embedding and sends it to the Qdrant database on port `6333`, where it is stored and indexed for future searches.
