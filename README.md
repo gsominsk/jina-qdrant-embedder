@@ -105,44 +105,39 @@ The services are managed by two separate `docker-compose.yml` files. You need to
 
 Once both services are running, the system is ready to be used by Roo Code.
 
-## Summary of Achievements and Performance
+## Performance and Semaphore Management
 
-After intensive debugging and optimization, the custom embedding service is now fully stable and performant.
-
-### Key Achievements
-- **Elimination of Memory Leaks:** Two separate memory leaks (one related to PyTorch tensors and another to the FastAPI/Starlette request lifecycle) were identified and completely fixed.
-- **Stable Memory Consumption:** Under heavy load, the service's memory usage is stable, peaking at approximately **4.4GB** and fluctuating within a safe **3-5 GB** range. This prevents OOM (Out of Memory) crashes.
-- **High Throughput:** The service can handle a high number of concurrent requests, ensuring fast and reliable embedding generation.
-
-### Performance and Semaphore Management
 The stability and performance of the service are critically dependent on managing concurrency. This is achieved using an `asyncio.Semaphore`.
 
-#### What is the Semaphore?
-The semaphore, defined in `embeddings/app/app.py`, limits the number of concurrent requests that can be processed by the embedding model at any given time. This prevents the system from being overwhelmed and running out of memory.
+### Semaphore Configuration
+The semaphore, defined in `embeddings/app/app.py`, limits the number of concurrent requests processed by the model.
+
+**Solution:** The semaphore value was set to the optimal value of `8`, calculated based on available system resources (8GB RAM, 4 CPU cores).
 
 ```python
 # embeddings/app/app.py
 SEMAPHORE_VALUE = 8
-SEMAPHORE = asyncio.Semaphore(SEMAPHORE_VALUE)
 ```
 
-#### How to Manage the Semaphore
+### Performance Results
+- **Optimized Performance:** The system effectively utilizes CPU resources.
+- **Memory Stability:** Final testing showed that with a semaphore value of `8`, memory consumption fluctuates within a safe **3-5 GB** range under load, preventing OOM crashes.
+
+### How to Tune the Semaphore
 The `SEMAPHORE_VALUE` is the most important parameter for performance tuning.
 
-- **Current Value:** The optimal value has been determined to be **8**. This provides the best balance between throughput and memory stability on a system with 8GB of available RAM.
-- **When to Change It:** You should only consider changing this value if you are running the service on a machine with significantly more or less RAM.
+- **Current Value:** The optimal value is **8** for a system with 8GB RAM.
+- **When to Change It:**
   - **More RAM:** You can try cautiously increasing the value (e.g., to `10` or `12`) to potentially increase throughput. Monitor memory usage closely.
-  - **Less RAM:** If you experience OOM crashes on a machine with less memory, you **must** decrease this value (e.g., to `4` or `6`). This will reduce the load on the system.
+  - **Less RAM:** If you experience OOM crashes, you **must** decrease this value (e.g., to `4` or `6`).
 - **How to Change It:** Edit the `SEMAPHORE_VALUE` constant directly in the [`embeddings/app/app.py`](embeddings/app/app.py:1) file and restart the service.
 
 ## Resource Consumption (Idle)
 
-When the services are running but not actively processing requests (i.e., no indexing is occurring), their baseline memory consumption is as follows:
+When the services are running but not actively processing requests, their baseline memory consumption is:
 
 -   **Embeddings Service (Jina):** ~921 MiB
 -   **Qdrant Database:** ~261 MiB
-
-This represents the memory required to load the models and keep the services ready. Memory usage will increase during active indexing, as detailed in the performance section.
 
 ## Visual Studio Code Integration
 
