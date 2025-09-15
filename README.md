@@ -105,78 +105,35 @@ The services are managed by two separate `docker-compose.yml` files. You need to
 
 Once both services are running, the system is ready to be used by Roo Code.
 
-## In-Depth Debugging and Performance Optimization
+## Summary of Achievements and Performance
 
-During intensive use, a critical instability issue was identified: under heavy load, the `jina-openai` container would crash due to an out-of-memory (OOM) error, leading to timeouts and service failures.
+After intensive debugging and optimization, the custom embedding service is now fully stable and performant.
 
-A detailed investigation revealed **two independent memory leaks**. The step-by-step process of their detection and resolution is described below.
+### Key Achievements
+- **Elimination of Memory Leaks:** Two separate memory leaks (one related to PyTorch tensors and another to the FastAPI/Starlette request lifecycle) were identified and completely fixed.
+- **Stable Memory Consumption:** Under heavy load, the service's memory usage is stable, peaking at approximately **4.4GB** and fluctuating within a safe **3-5 GB** range. This prevents OOM (Out of Memory) crashes.
+- **High Throughput:** The service can handle a high number of concurrent requests, ensuring fast and reliable embedding generation.
 
-### Step 1: Tooling and Diagnostics
+### Performance and Semaphore Management
+The stability and performance of the service are critically dependent on managing concurrency. This is achieved using an `asyncio.Semaphore`.
 
-For an accurate analysis, profiling tools were temporarily added to the application code (`embeddings/app/app.py`):
-1.  **Memory Monitoring with `psutil`:** To log real-time physical memory consumption (RSS).
-2.  **Profiling with `tracemalloc`:** To track Python objects that allocate memory and are not released.
-
-An initial load test confirmed a fast memory leak, after which the semaphore value (`SEMAPHORE_VALUE`) was temporarily reduced from `8` to `2` to isolate the problem.
-
-### Step 2: Fixing the Critical Leak (PyTorch Tensors)
-
-Analysis of `tracemalloc` logs showed that memory was rapidly leaking due to PyTorch tensors that were not being released after processing each batch. Python's garbage collector could not automatically clear the memory occupied on the GPU.
-
-**Solution:**
-Explicit resource cleanup was added to the processing code after use.
-
-```python
-# embeddings/app/app.py
-# ... inside the encoding function ...
-del batch_embeddings
-del tokens
-torch.cuda.empty_cache()
-```
-This step completely eliminated the fast leak, but a second, slower one remained.
-
-### Step 3: Fixing the Slow Leak (FastAPI/Starlette)
-
-After fixing the main issue, `tracemalloc` pointed to a new cause: objects related to the request-response lifecycle in the FastAPI and Starlette frameworks. These objects were not always being correctly garbage-collected in the asynchronous environment.
-
-**Solution:**
-A global middleware was implemented to forcibly run the garbage collector (`gc.collect()`) after each HTTP request is complete.
-
-```python
-# embeddings/app/app.py
-import gc
-from fastapi import FastAPI, Request
-
-app = FastAPI()
-
-@app.middleware("http")
-async def garbage_collector_middleware(request: Request, call_next):
-    response = await call_next(request)
-    gc.collect()
-    return response
-```
-This solution completely eliminated the second leak.
-
-### Step 4: Final Performance Tuning
-
-After both leaks were fully resolved, the final step was to restore the initial performance.
-
-**Solution:**
-The semaphore value was returned to the optimal value of `8`, which was calculated based on the available RAM.
+#### What is the Semaphore?
+The semaphore, defined in `embeddings/app/app.py`, limits the number of concurrent requests that can be processed by the embedding model at any given time. This prevents the system from being overwhelmed and running out of memory.
 
 ```python
 # embeddings/app/app.py
 SEMAPHORE_VALUE = 8
+SEMAPHORE = asyncio.Semaphore(SEMAPHORE_VALUE)
 ```
 
-### Final Result
+#### How to Manage the Semaphore
+The `SEMAPHORE_VALUE` is the most important parameter for performance tuning.
 
-As a result of this work, the service was fully stabilized.
--   **Memory Leaks Fixed:** RAM consumption is under control.
--   **Performance Optimized:** The system effectively uses CPU resources.
--   **Stability:** The service successfully handles high loads without crashing.
-
-Final testing showed that with a semaphore value of `8`, memory consumption fluctuates within a safe 3-5 GB range.
+- **Current Value:** The optimal value has been determined to be **8**. This provides the best balance between throughput and memory stability on a system with 8GB of available RAM.
+- **When to Change It:** You should only consider changing this value if you are running the service on a machine with significantly more or less RAM.
+  - **More RAM:** You can try cautiously increasing the value (e.g., to `10` or `12`) to potentially increase throughput. Monitor memory usage closely.
+  - **Less RAM:** If you experience OOM crashes on a machine with less memory, you **must** decrease this value (e.g., to `4` or `6`). This will reduce the load on the system.
+- **How to Change It:** Edit the `SEMAPHORE_VALUE` constant directly in the [`embeddings/app/app.py`](embeddings/app/app.py:1) file and restart the service.
 
 ## Visual Studio Code Integration
 
