@@ -135,6 +135,15 @@ The `SEMAPHORE_VALUE` is the most important parameter for performance tuning.
   - **Less RAM:** If you experience OOM crashes on a machine with less memory, you **must** decrease this value (e.g., to `4` or `6`). This will reduce the load on the system.
 - **How to Change It:** Edit the `SEMAPHORE_VALUE` constant directly in the [`embeddings/app/app.py`](embeddings/app/app.py:1) file and restart the service.
 
+## Resource Consumption (Idle)
+
+When the services are running but not actively processing requests (i.e., no indexing is occurring), their baseline memory consumption is as follows:
+
+-   **Embeddings Service (Jina):** ~921 MiB
+-   **Qdrant Database:** ~261 MiB
+
+This represents the memory required to load the models and keep the services ready. Memory usage will increase during active indexing, as detailed in the performance section.
+
 ## Visual Studio Code Integration
 
 For maximum convenience, the project is configured to be managed directly from VS Code using hotkeys. To do this, you need to configure two files in your VS Code setup.
