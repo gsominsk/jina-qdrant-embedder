@@ -83,7 +83,7 @@ async def startup_event():
     # Estimated Memory per Concurrent Request: ~0.5GB (conservative estimate)
     # Max Concurrent Requests: 5.5GB / 0.5GB = 11
     # We choose a value of 8, which was calculated based on available system RAM.
-    SEMAPHORE_VALUE = 8
+    SEMAPHORE_VALUE = 4
     app.state.semaphore = asyncio.Semaphore(SEMAPHORE_VALUE)
     logger.info(f"Semaphore initialized with a value of {SEMAPHORE_VALUE}")
 # --- End Memory Profiling ---
@@ -94,7 +94,7 @@ def health():
     return {"status": "ok"}
 
 @app.post("/v1/embeddings")
-async def create_embeddings(req: EmbeddingsRequest, fastapi_req: Request):
+async def create_embeddings(req: EmbeddingsRequest):
     loop = asyncio.get_event_loop()
 
     async with app.state.semaphore:

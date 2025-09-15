@@ -10,7 +10,7 @@
 # - `!` negates a pattern, allowing you to un-ignore a file or directory.
 
 # By default, ignore everything to ensure safety and focus.
-*
+# *
 
 # To allow the assistant to access specific files or directories,
 # use the `!` prefix.

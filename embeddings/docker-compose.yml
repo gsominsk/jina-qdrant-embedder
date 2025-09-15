@@ -3,12 +3,16 @@ services:
     build:
       context: ./app
     container_name: jina-openai
+    deploy:
+      resources:
+        limits:
+          cpus: '4.0'
     ports:
       - "4000:8082"
     environment:
       - MODEL_NAME=jinaai/jina-embeddings-v2-base-code
       - JINA_TELEMETRY_OPTOUT=1
-      - MICRO_BATCH_SIZE=16
+      - MICRO_BATCH_SIZE=8
     healthcheck:
       test: ["CMD", "curl", "-fsS", "http://localhost:8082/health"]
       interval: 30s
