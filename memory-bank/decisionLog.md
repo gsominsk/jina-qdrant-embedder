@@ -138,3 +138,4 @@ SEMAPHORE_VALUE = 8
 -   **Стабильность:** Сервис успешно справляется с высокой нагрузкой без сбоев.
 
 Финальное тестирование показало, что при значении семафора `8` потребление памяти колеблется в безопасном диапазоне 3-5 ГБ.
+[2025-09-18 15:11:07] - Added logging for the number of tasks waiting in the semaphore queue in `embeddings/app/app.py` to diagnose performance bottlenecks with large projects.

@@ -97,6 +97,12 @@ def health():
 async def create_embeddings(req: EmbeddingsRequest):
     loop = asyncio.get_event_loop()
 
+    # Логируем размер очереди ожидания семафора
+    queue_size = 0
+    if hasattr(app.state.semaphore, '_waiters') and app.state.semaphore._waiters is not None:
+        queue_size = len(app.state.semaphore._waiters)
+    logger.info(f"Tasks waiting in queue: {queue_size}")
+
     async with app.state.semaphore:
         logger.info("Semaphore acquired. Processing request.")
         # Запускаем блокирующий код в отдельном потоке
