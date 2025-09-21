@@ -48,3 +48,4 @@
     - **Solution:** Used `git rm -r --cached .venv/` to remove from index while preserving local files, then committed the deletion.
     - **Result:** Repository cleaned, venv files no longer tracked, local environment intact.
     - **Outcome:** The service is now significantly faster on GPU and has robust memory management. Optimization efforts are concluded, with memory usage deemed acceptable.
+[2025-09-21 20:00:50] - Completed detailed analysis of embeddings service logs, identified excessive logging verbosity as main issue, created commit with logging optimizations and script fixes
