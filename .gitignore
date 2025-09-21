@@ -16,4 +16,10 @@ __pycache__/
 qdrant/storage/
 # Log files
 *.log
+# Virtual environments
+venv/
+.venv/
+
+# Logs
+logs/
 nohup.out

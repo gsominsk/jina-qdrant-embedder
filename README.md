@@ -87,23 +87,80 @@ Here is a simple ASCII diagram illustrating the data flow:
 
 ## How to Run
 
-The services are managed by two separate `docker-compose.yml` files. You need to start both for the system to be fully operational.
+This project offers two primary methods for running the services, depending on your operating system and performance needs. All operations are centralized through the `./scripts/manage.sh` script.
 
-1.  **Start the Qdrant Database:**
-    Open a terminal and run the following command from the project root directory:
+### Option 1: Docker-Based Environment (CPU / CUDA)
+
+This is the universal, cross-platform method. It's ideal for standard development on any OS and for production environments, especially those with NVIDIA GPUs, as Docker can utilize CUDA for acceleration.
+
+-   **Start All Services:**
     ```bash
-    docker-compose -f qdrant/docker-compose.yml up -d
+    ./scripts/manage.sh start all
     ```
-    This will start the Qdrant container and expose its service on port `6333`.
 
-2.  **Start the Embeddings Service:**
-    In another terminal, run the following command from the project root directory:
+-   **Stop All Services:**
     ```bash
-    docker-compose -f embeddings/docker-compose.yml up -d
+    ./scripts/manage.sh stop all
     ```
-    This will build and start the custom FastAPI application. The service will be available on port `4000`.
 
-Once both services are running, the system is ready to be used by Roo Code.
+-   **Restart All Services:**
+    ```bash
+    ./scripts/manage.sh restart all
+    ```
+
+### Option 2: Hybrid Environment for macOS (Apple Silicon GPU)
+
+This is a specialized, high-performance setup for developers on **macOS with Apple Silicon (M1/M2/M3)**. It is necessary because Docker on macOS cannot access the host's GPU (MPS). This hybrid approach runs the performance-critical `embeddings` service natively on the host to unlock full GPU acceleration, while the `qdrant` database continues to run conveniently in Docker.
+
+#### Prerequisites
+
+You must have [pyenv](https://github.com/pyenv/pyenv#installation) and [tmux](https://github.com/tmux/tmux/wiki/Installing) installed. You can install them via Homebrew:
+```bash
+brew install pyenv tmux
+```
+
+#### One-Time Setup
+
+Before the first run, prepare the local Python environment with a single command:
+```bash
+./scripts/manage.sh local setup
+```
+This script automates:
+1.  Installation of the correct Python version via `pyenv`.
+2.  Creation of a local virtual environment (`./venv`).
+3.  Installation of all required Python dependencies.
+
+#### Running the Hybrid Environment
+
+1.  **Start Qdrant (in Docker):**
+    ```bash
+    ./scripts/manage.sh start qdrant
+    ```
+
+2.  **Start Embeddings Service (Locally on macOS):**
+    ```bash
+    ./scripts/manage.sh local start
+    ```
+    This starts the service in a background `tmux` session and logs all output to `logs/embeddings_local.log`.
+
+#### Managing the Local Service
+
+-   **View Real-time Logs:**
+    Attach to the background session to see the live output from the service.
+    ```bash
+    ./scripts/manage.sh local logs
+    ```
+    *(To detach from the log view, press `Ctrl-b` then `d`)*
+
+-   **Stop the Local Service:**
+    ```bash
+    ./scripts/manage.sh local stop
+    ```
+
+-   **Restart the Local Service:**
+    ```bash
+    ./scripts/manage.sh local restart
+    ```
 
 ## Performance and Semaphore Management
 

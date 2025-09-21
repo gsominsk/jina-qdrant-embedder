@@ -9,3 +9,6 @@ torch
 
 optimum
 psutil
+
+pytest
+pytest-asyncio
