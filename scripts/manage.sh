@@ -132,7 +132,7 @@ show_status() {
     fi
 
     # Check Embeddings (Docker)
-    if docker compose -f "$EMBEDDINGS_COMPOSE_FILE" ps --status=running | grep -q "embeddings-app"; then
+    if docker compose -f "$EMBEDDINGS_COMPOSE_FILE" ps --status=running | grep -q "jina-openai"; then
         echo "  - Embeddings (Docker): Running"
     else
         echo "  - Embeddings (Docker): Stopped"

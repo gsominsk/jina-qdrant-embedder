@@ -43,4 +43,8 @@
         - Developed and tested an intelligent, idle-based memory cleanup mechanism using `malloc_trim` to reclaim memory without impacting performance under load.
         - Refactored the application to use modern FastAPI `lifespan` and dependency injection patterns.
         - Established a `pytest` testing framework to ensure the reliability of the new complex logic.
+[2025-09-21 19:31:06] - **COMPLETED:** Fixed accidentally committed venv files.
+    - **Issue:** Virtual environment (.venv/) with 20,427 files was committed to git, bloating repository.
+    - **Solution:** Used `git rm -r --cached .venv/` to remove from index while preserving local files, then committed the deletion.
+    - **Result:** Repository cleaned, venv files no longer tracked, local environment intact.
     - **Outcome:** The service is now significantly faster on GPU and has robust memory management. Optimization efforts are concluded, with memory usage deemed acceptable.
