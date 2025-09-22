@@ -302,12 +302,42 @@ SEMAPHORE_VALUE = int(os.environ.get("SEMAPHORE_VALUE", "4"))  # За замов
       "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "stop", "jina"]
     },
     {
+      "label": "local start",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "start"]
+    },
+    {
+      "label": "local stop",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "stop"]
+    },
+    {
+      "label": "local restart",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "restart"]
+    },
+    {
+      "label": "local logs",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "logs"]
+    },
+    {
+      "label": "local setup",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "setup"]
+    },
+    {
       "label": "help: embeddings shortcuts",
       "type": "shell",
       "command": "echo",
       "args": [
         "-e",
-        "\\033[1mJina/Qdrant — гарячі клавіші\\033[0m\\n\\n  ⌘⇧9   startall + warmup      — Запустити Qdrant, Jina та прогріти ембединги\\n  ⌘⇧=   restartall            — Перезапустити всі сервіси\\n  ⌘⇧0   help: embeddings shortcuts  — Показати цей екран\\n  ⌘⇧-   stopall               — Зупинити Jina та Qdrant\\n  ⌘⇧8   qdrant restart        — Перезапустити Qdrant\\n  ⌘⇧7   jina start + warmup   — Запустити Jina та прогріти\\n  ⌘⇧6   jina stop             — Зупинити Jina\\n\\nПідказка: команди налаштовуються в User Tasks та Keyboard Shortcuts (JSON)."
+        "\\033[1mJina/Qdrant — гарячі клавіші\\033[0m\\n\\n\\033[1mDocker режим:\\033[0m\\n  ⌘⇧9   startall + warmup      — Запустити Qdrant, Jina та прогріти ембединги\\n  ⌘⇧=   restartall            — Перезапустити всі сервіси\\n  ⌘⇧-   stopall               — Зупинити Jina та Qdrant\\n  ⌘⇧8   qdrant restart        — Перезапустити Qdrant\\n  ⌘⇧7   jina start + warmup   — Запустити Jina та прогріти\\n  ⌘⇧6   jina stop             — Зупинити Jina\\n\\n\\033[1mЛокальний режим (macOS GPU):\\033[0m\\n  ⌘⇧1   local start           — Запустити локальний embeddings сервіс\\n  ⌘⇧2   local stop            — Зупинити локальний сервіс\\n  ⌘⇧3   local restart         — Перезапустити локальний сервіс\\n  ⌘⇧4   local logs            — Перегляд логів локального сервісу\\n  ⌘⇧5   local setup           — Налаштувати локальне середовище\\n\\n  ⌘⇧0   help: embeddings shortcuts  — Показати цей екран\\n\\nПідказка: команди налаштовуються в User Tasks та Keyboard Shortcuts (JSON)."
       ],
       "presentation": {
         "reveal": "always",
@@ -366,6 +396,31 @@ SEMAPHORE_VALUE = int(os.environ.get("SEMAPHORE_VALUE", "4"))  # За замов
     "key": "cmd+shift+6",
     "command": "workbench.action.tasks.runTask",
     "args": "jina stop"
+  },
+  {
+    "key": "cmd+shift+1",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local start"
+  },
+  {
+    "key": "cmd+shift+2",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local stop"
+  },
+  {
+    "key": "cmd+shift+3",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local restart"
+  },
+  {
+    "key": "cmd+shift+4",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local logs"
+  },
+  {
+    "key": "cmd+shift+5",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local setup"
   }
 ]
 ```
@@ -374,6 +429,7 @@ SEMAPHORE_VALUE = int(os.environ.get("SEMAPHORE_VALUE", "4"))  # За замов
 
 Після налаштування ви зможете керувати сервісами за допомогою наступних сполучень клавіш (для macOS, замініть `cmd` на `ctrl` для Windows/Linux):
 
+#### Команди Docker режиму
 | Гаряча клавіша | Команда                  | Опис                                           |
 | --------------- | ------------------------ | -------------------------------------------------- |
 | `⌘ + ⇧ + 9`     | `startall + warmup`      | Запустити Qdrant, Jina та прогріти ембединги        |
@@ -382,4 +438,17 @@ SEMAPHORE_VALUE = int(os.environ.get("SEMAPHORE_VALUE", "4"))  # За замов
 | `⌘ + ⇧ + 8`     | `qdrant restart`         | Перезапустити тільки Qdrant                        |
 | `⌘ + ⇧ + 7`     | `jina start + warmup`    | Запустити тільки Jina та прогріти                    |
 | `⌘ + ⇧ + 6`     | `jina stop`              | Зупинити тільки Jina                             |
+
+#### Команди локального режиму (macOS GPU)
+| Гаряча клавіша | Команда                  | Опис                                           |
+| --------------- | ------------------------ | -------------------------------------------------- |
+| `⌘ + ⇧ + 1`     | `local start`            | Запустити локальний embeddings сервіс              |
+| `⌘ + ⇧ + 2`     | `local stop`             | Зупинити локальний сервіс                        |
+| `⌘ + ⇧ + 3`     | `local restart`          | Перезапустити локальний сервіс                     |
+| `⌘ + ⇧ + 4`     | `local logs`             | Перегляд логів локального сервісу                  |
+| `⌘ + ⇧ + 5`     | `local setup`            | Налаштувати локальне середовище                      |
+
+#### Загальні команди
+| Гаряча клавіша | Команда                  | Опис                                           |
+| --------------- | ------------------------ | -------------------------------------------------- |
 | `⌘ + ⇧ + 0`     | `help: embeddings shortcuts` | Показати цю довідку в терміналі VS Code           |

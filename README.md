@@ -293,12 +293,42 @@ Paste the following content into it, **making sure to replace** `$HOME/sandbox/m
       "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "stop", "jina"]
     },
     {
+      "label": "local start",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "start"]
+    },
+    {
+      "label": "local stop",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "stop"]
+    },
+    {
+      "label": "local restart",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "restart"]
+    },
+    {
+      "label": "local logs",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "logs"]
+    },
+    {
+      "label": "local setup",
+      "type": "shell",
+      "command": "bash",
+      "args": ["$HOME/sandbox/mcp/scripts/manage.sh", "local", "setup"]
+    },
+    {
       "label": "help: embeddings shortcuts",
       "type": "shell",
       "command": "echo",
       "args": [
         "-e",
-        "\\033[1mJina/Qdrant — Hotkeys\\033[0m\\n\\n  ⌘⇧9   startall + warmup      — Start Qdrant, Jina, and warm up embeddings\\n  ⌘⇧=   restartall            — Restart all services\\n  ⌘⇧0   help: embeddings shortcuts  — Show this help screen\\n  ⌘⇧-   stopall               — Stop Jina and Qdrant\\n  ⌘⇧8   qdrant restart        — Restart Qdrant\\n  ⌘⇧7   jina start + warmup   — Start Jina and warm up\\n  ⌘⇧6   jina stop             — Stop Jina\\n\\nHint: Commands are configured in User Tasks and Keyboard Shortcuts (JSON)."
+        "\\033[1mJina/Qdrant — Hotkeys\\033[0m\\n\\n\\033[1mDocker Mode:\\033[0m\\n  ⌘⇧9   startall + warmup      — Start Qdrant, Jina, and warm up embeddings\\n  ⌘⇧=   restartall            — Restart all services\\n  ⌘⇧-   stopall               — Stop Jina and Qdrant\\n  ⌘⇧8   qdrant restart        — Restart Qdrant\\n  ⌘⇧7   jina start + warmup   — Start Jina and warm up\\n  ⌘⇧6   jina stop             — Stop Jina\\n\\n\\033[1mLocal Mode (macOS GPU):\\033[0m\\n  ⌘⇧1   local start           — Start local embeddings service\\n  ⌘⇧2   local stop            — Stop local service\\n  ⌘⇧3   local restart         — Restart local service\\n  ⌘⇧4   local logs            — View local service logs\\n  ⌘⇧5   local setup           — Setup local environment\\n\\n  ⌘⇧0   help: embeddings shortcuts  — Show this help screen\\n\\nHint: Commands are configured in User Tasks and Keyboard Shortcuts (JSON)."
       ],
       "presentation": {
         "reveal": "always",
@@ -357,6 +387,31 @@ Paste the following content into it:
     "key": "cmd+shift+6",
     "command": "workbench.action.tasks.runTask",
     "args": "jina stop"
+  },
+  {
+    "key": "cmd+shift+1",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local start"
+  },
+  {
+    "key": "cmd+shift+2",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local stop"
+  },
+  {
+    "key": "cmd+shift+3",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local restart"
+  },
+  {
+    "key": "cmd+shift+4",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local logs"
+  },
+  {
+    "key": "cmd+shift+5",
+    "command": "workbench.action.tasks.runTask",
+    "args": "local setup"
   }
 ]
 ```
@@ -365,6 +420,7 @@ Paste the following content into it:
 
 After setup, you can manage the services with the following key combinations (for macOS; replace `cmd` with `ctrl` for Windows/Linux):
 
+#### Docker Mode Commands
 | Hotkey          | Command                  | Description                                        |
 | --------------- | ------------------------ | -------------------------------------------------- |
 | `⌘ + ⇧ + 9`     | `startall + warmup`      | Start Qdrant, Jina, and warm up embeddings         |
@@ -373,4 +429,17 @@ After setup, you can manage the services with the following key combinations (fo
 | `⌘ + ⇧ + 8`     | `qdrant restart`         | Restart only Qdrant                                |
 | `⌘ + ⇧ + 7`     | `jina start + warmup`    | Start only Jina and warm up                        |
 | `⌘ + ⇧ + 6`     | `jina stop`              | Stop only Jina                                     |
+
+#### Local Mode Commands (macOS GPU)
+| Hotkey          | Command                  | Description                                        |
+| --------------- | ------------------------ | -------------------------------------------------- |
+| `⌘ + ⇧ + 1`     | `local start`            | Start local embeddings service                     |
+| `⌘ + ⇧ + 2`     | `local stop`             | Stop local service                                 |
+| `⌘ + ⇧ + 3`     | `local restart`          | Restart local service                              |
+| `⌘ + ⇧ + 4`     | `local logs`             | View local service logs                            |
+| `⌘ + ⇧ + 5`     | `local setup`            | Setup local environment                            |
+
+#### General Commands
+| Hotkey          | Command                  | Description                                        |
+| --------------- | ------------------------ | -------------------------------------------------- |
 | `⌘ + ⇧ + 0`     | `help: embeddings shortcuts` | Show this help screen in the VS Code terminal      |
