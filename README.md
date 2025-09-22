@@ -14,51 +14,59 @@ The system consists of two main services, orchestrated with Docker Compose:
 Here is a simple ASCII diagram illustrating the data flow:
 
 ```
-+--------------------------+
-|      Roo Code Client     |
-| (in your IDE, configured |
-| via roo-code-config.json)|
-+--------------------------+
-           |
-           | 1. POST code to be embedded
-           v
-+--------------------------+
-|  Custom FastAPI Service |
-|  (Docker, Port 4000)     |
-|--------------------------|
-|   |                      |
-|   | 2. Process with...   |
-|   v                      |
-| +--------------------+   |
-| | jina-code-v2 Model |   |
-| +--------------------+   |
-|   ^                      |
-|   | 3. Return vector     |
-|   |                      |
-+--------------------------+
-           |
-           | 4. Return OpenAI-compatible embedding
-           v
-+--------------------------+
-|      Roo Code Client     |
-| (receives embedding)     |
-+--------------------------+
-           |
-           | 5. Store embedding in...
-           v
-+--------------------------+
-|    Qdrant Vector DB      |
-|    (Docker, Port 6333)   |
-+--------------------------+
++---------------------------------+
+|        Roo Code Client          |
+| (in your IDE, configured via    |
+|  roo-code-config.json)          |
++---------------------------------+
+            |
+            | 1. POST code to be embedded
+            v
++---------------------------------+
+|    Custom FastAPI Service       |
+|    (Docker, Port 4000)          |
+|---------------------------------|
+|   |        Health: /health      |
+|   | 2. Process with...          |
+|   v                             |
+| +-----------------------------+ |
+| | jinaai/jina-embeddings-v2-  | |
+| | base-code Model             | |
+| +-----------------------------+ |
+|   ^                             |
+|   | 3. Return vector            |
+|   |                             |
++---------------------------------+
+            |
+            | 4. Return OpenAI-compatible embedding
+            v
++---------------------------------+
+|        Roo Code Client          |
+|    (receives embedding)         |
++---------------------------------+
+            |
+            | 5. Store embedding in...
+            v
++---------------------------------+
+|      Qdrant Vector DB           |
+|      (Docker, Port 6333)        |
+|      Health: /collections       |
++---------------------------------+
+
+Warmup Service: Initializes model on startup
 ```
 
 ### Explanation of the Flow:
 
 1.  **Roo Code to FastAPI:** Your IDE, using settings from `roo-code-config.json`, sends a code snippet to the custom FastAPI service on port `4000`.
-2.  **FastAPI to Model:** The FastAPI service (the layer) takes the code and passes it to the `jina-code-v2` model, which runs in the same container.
+2.  **FastAPI to Model:** The FastAPI service (the layer) takes the code and passes it to the `jinaai/jina-embeddings-v2-base-code` model, which runs in the same container.
 3.  **Model to FastAPI:** The model converts the code into a numerical vector (the embedding) and returns it to the service.
 4.  **FastAPI to Roo Code:** The service wraps this vector in a standard JSON format and sends it back to your IDE.
 5.  **Roo Code to Qdrant:** Your IDE receives the embedding and sends it to the Qdrant database on port `6333`, where it is stored and indexed for future searches.
+
+**Additional Services:**
+- **Warmup Service:** Automatically initializes the model on container startup by sending a test request.
+- **Health Checks:** Both services expose health endpoints (`/health` for embeddings, `/collections` for Qdrant) for monitoring availability.
 
 ## How It Works
 
@@ -72,7 +80,7 @@ Here is a simple ASCII diagram illustrating the data flow:
     {
       "embeddingProvider": "openai",
       "baseUrl": "http://localhost:4000/v1",
-      "modelId": "jina-code-v2",
+      "modelId": "jinaai/jina-embeddings-v2-base-code",
       "embeddingDimension": 768,
       "vectorStore": "qdrant",
       "qdrantUrl": "http://localhost:6333"
@@ -141,7 +149,7 @@ This script automates:
     ```bash
     ./scripts/manage.sh local start
     ```
-    This starts the service in a background `tmux` session and logs all output to `logs/embeddings_local.log`.
+    This starts the service in a background `tmux` session with semaphore value `2` (optimized for MPS GPU) and logs all output to `logs/embeddings_local.log`.
 
 #### Managing the Local Service
 
@@ -169,32 +177,66 @@ The stability and performance of the service are critically dependent on managin
 ### Semaphore Configuration
 The semaphore, defined in `embeddings/app/app.py`, limits the number of concurrent requests processed by the model.
 
-**Solution:** The semaphore value was set to the optimal value of `8`, calculated based on available system resources (8GB RAM, 4 CPU cores).
+**Default Values:**
+- **Docker CPU mode:** Optimal value is `8` (calculated for 8GB RAM, 4 CPU cores)
+- **macOS GPU (MPS) mode:** Current default is `2` (suitable for local GPU execution)
 
 ```python
 # embeddings/app/app.py
-SEMAPHORE_VALUE = 8
+SEMAPHORE_VALUE = int(os.environ.get("SEMAPHORE_VALUE", "4"))  # Default 4 for macOS GPU
 ```
-
-### Performance Results
-- **Optimized Performance:** The system effectively utilizes CPU resources.
-- **Memory Stability:** Final testing showed that with a semaphore value of `8`, memory consumption fluctuates within a safe **3-5 GB** range under load, preventing OOM crashes.
 
 ### How to Tune the Semaphore
 The `SEMAPHORE_VALUE` is the most important parameter for performance tuning.
 
-- **Current Value:** The optimal value is **8** for a system with 8GB RAM.
+- **Docker CPU Mode:** Use `8` for systems with 8GB RAM and 4 CPU cores.
+- **macOS GPU Mode:** Use `4` for optimal MPS performance.
 - **When to Change It:**
   - **More RAM:** You can try cautiously increasing the value (e.g., to `10` or `12`) to potentially increase throughput. Monitor memory usage closely.
   - **Less RAM:** If you experience OOM crashes, you **must** decrease this value (e.g., to `4` or `6`).
-- **How to Change It:** Edit the `SEMAPHORE_VALUE` constant directly in the [`embeddings/app/app.py`](embeddings/app/app.py:1) file and restart the service.
+- **How to Change It:** Set the `SEMAPHORE_VALUE` environment variable or edit the constant directly in the [`embeddings/app/app.py`](embeddings/app/app.py:1) file and restart the service.
 
-## Resource Consumption (Idle)
+## Advanced Features
+
+The embeddings service includes several advanced features for optimal performance and monitoring:
+
+### Idle-Based Memory Cleanup
+
+When the service is idle for 60 seconds, it automatically triggers aggressive memory cleanup:
+- Python garbage collection (`gc.collect()`)
+- PyTorch cache cleanup (MPS/CUDA)
+- Memory release back to OS using `malloc_trim` (Linux/macOS)
+
+### Statistics Logging
+
+The service logs aggregated statistics every 30 seconds during active operation:
+- Total requests processed
+- Average and maximum wait times
+- Maximum queue depth
+
+### Memory Profiling
+
+Built-in memory profiling using `tracemalloc` provides detailed memory usage analysis for each request, helping identify and resolve memory issues.
+
+### Health Monitoring
+
+The service exposes a `/health` endpoint for monitoring service availability.
+
+## Resource Consumption
+
+### Idle Consumption
 
 When the services are running but not actively processing requests, their baseline memory consumption is:
 
 -   **Embeddings Service (Jina):** ~921 MiB
 -   **Qdrant Database:** ~261 MiB
+
+### Peak Load Consumption
+
+Under high load, memory usage varies by deployment mode:
+
+-   **Docker CPU Mode (semaphore = 8):** Peak memory consumption fluctuates within a safe **3-5 GB** range, preventing OOM crashes.
+-   **macOS GPU Mode (semaphore = 2):** Peak memory consumption reaches ~4 GB under load. After initial warmup, stabilizes at ~2.7 GB for ongoing operation.
 
 ## Visual Studio Code Integration
 
