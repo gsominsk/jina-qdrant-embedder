@@ -70,3 +70,4 @@ This approach allows the `qdrant` service to continue running in Docker, while t
 **Open Questions/Issues:**
 - Does the Docker-based CPU version still work after refactoring to lifespan and other changes?
 - Any breaking changes in API compatibility?
+[2025-09-23 21:51:00] - **Recent Changes:** Updated hotkey for "local logs" from Cmd+Shift+4 to Cmd+Shift+L in keybindings.json, tasks.json (help screen), and README.md to avoid conflicts and improve usability. All references synchronized.

@@ -328,7 +328,7 @@ Paste the following content into it, **making sure to replace** `$HOME/sandbox/m
       "command": "echo",
       "args": [
         "-e",
-        "\\033[1mJina/Qdrant — Hotkeys\\033[0m\\n\\n\\033[1mDocker Mode:\\033[0m\\n  ⌘⇧9   startall + warmup      — Start Qdrant, Jina, and warm up embeddings\\n  ⌘⇧=   restartall            — Restart all services\\n  ⌘⇧-   stopall               — Stop Jina and Qdrant\\n  ⌘⇧8   qdrant restart        — Restart Qdrant\\n  ⌘⇧7   jina start + warmup   — Start Jina and warm up\\n  ⌘⇧6   jina stop             — Stop Jina\\n\\n\\033[1mLocal Mode (macOS GPU):\\033[0m\\n  ⌘⇧1   local start           — Start local embeddings service\\n  ⌘⇧2   local stop            — Stop local service\\n  ⌘⇧3   local restart         — Restart local service\\n  ⌘⇧4   local logs            — View local service logs\\n  ⌘⇧5   local setup           — Setup local environment\\n\\n  ⌘⇧0   help: embeddings shortcuts  — Show this help screen\\n\\nHint: Commands are configured in User Tasks and Keyboard Shortcuts (JSON)."
+        "\\033[1mJina/Qdrant — Hotkeys\\033[0m\\n\\n\\033[1mDocker Mode:\\033[0m\\n  ⌘⇧9   startall + warmup      — Start Qdrant, Jina, and warm up embeddings\\n  ⌘⇧=   restartall            — Restart all services\\n  ⌘⇧-   stopall               — Stop Jina and Qdrant\\n  ⌘⇧8   qdrant restart        — Restart Qdrant\\n  ⌘⇧7   jina start + warmup   — Start Jina and warm up\\n  ⌘⇧6   jina stop             — Stop Jina\\n\\n\\033[1mLocal Mode (macOS GPU):\\033[0m\\n  ⌘⇧1   local start           — Start local embeddings service\\n  ⌘⇧2   local stop            — Stop local service\\n  ⌘⇧3   local restart         — Restart local service\\n  ⌘⇧L   local logs            — View local service logs\\n  ⌘⇧5   local setup           — Setup local environment\\n\\n  ⌘⇧0   help: embeddings shortcuts  — Show this help screen\\n\\nHint: Commands are configured in User Tasks and Keyboard Shortcuts (JSON)."
       ],
       "presentation": {
         "reveal": "always",
@@ -404,7 +404,7 @@ Paste the following content into it:
     "args": "local restart"
   },
   {
-    "key": "cmd+shift+4",
+    "key": "cmd+shift+l",
     "command": "workbench.action.tasks.runTask",
     "args": "local logs"
   },
@@ -436,10 +436,11 @@ After setup, you can manage the services with the following key combinations (fo
 | `⌘ + ⇧ + 1`     | `local start`            | Start local embeddings service                     |
 | `⌘ + ⇧ + 2`     | `local stop`             | Stop local service                                 |
 | `⌘ + ⇧ + 3`     | `local restart`          | Restart local service                              |
-| `⌘ + ⇧ + 4`     | `local logs`             | View local service logs                            |
+| `⌘ + ⇧ + L`     | `local logs`             | View local service logs                            |
 | `⌘ + ⇧ + 5`     | `local setup`            | Setup local environment                            |
 
 #### General Commands
 | Hotkey          | Command                  | Description                                        |
 | --------------- | ------------------------ | -------------------------------------------------- |
+| `⌘ + ⇧ + S`     | `status`                 | Check status of all services                       |
 | `⌘ + ⇧ + 0`     | `help: embeddings shortcuts` | Show this help screen in the VS Code terminal      |
