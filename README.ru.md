@@ -332,7 +332,7 @@ SEMAPHORE_VALUE = int(os.environ.get("SEMAPHORE_VALUE", "4"))  # По умолч
       "command": "echo",
       "args": [
         "-e",
-        "\\033[1mJina/Qdrant — горячие клавиши\\033[0m\\n\\n\\033[1mDocker режим:\\033[0m\\n  ⌘⇧9   startall + warmup      — Запустить Qdrant, Jina и прогреть эмбеддинги\\n  ⌘⇧=   restartall            — Перезапустить все сервисы\\n  ⌘⇧-   stopall               — Остановить Jina и Qdrant\\n  ⌘⇧8   qdrant restart        — Перезапустить Qdrant\\n  ⌘⇧7   jina start + warmup   — Запустить Jina и прогреть\\n  ⌘⇧6   jina stop             — Остановить Jina\\n\\n\\033[1mЛокальный режим (macOS GPU):\\033[0m\\n  ⌘⇧1   local start           — Запустить локальный embeddings сервис\\n  ⌘⇧2   local stop            — Остановить локальный сервис\\n  ⌘⇧3   local restart         — Перезапустить локальный сервис\\n  ⌘⇧4   local logs            — Просмотр логов локального сервиса\\n  ⌘⇧5   local setup           — Настроить локальное окружение\\n\\n  ⌘⇧0   help: embeddings shortcuts  — Показать этот экран\\n\\nПодсказка: команды настраиваются в User Tasks и Keyboard Shortcuts (JSON)."
+        "\\033[1mJina/Qdrant — горячие клавиши\\033[0m\\n\\n\\033[1mDocker режим:\\033[0m\\n  ⌘⇧9   startall + warmup      — Запустить Qdrant, Jina и прогреть эмбеддинги\\n  ⌘⇧=   restartall            — Перезапустить все сервисы\\n  ⌘⇧-   stopall               — Остановить Jina и Qdrant\\n  ⌘⇧8   qdrant restart        — Перезапустить Qdrant\\n  ⌘⇧7   jina start + warmup   — Запустить Jina и прогреть\\n  ⌘⇧6   jina stop             — Остановить Jina\\n\\n\\033[1mЛокальный режим (macOS GPU):\\033[0m\\n  ⌘⇧1   local start           — Запустить локальный embeddings сервис\\n  ⌘⇧2   local stop            — Остановить локальный сервис\\n  ⌘⇧3   local restart         — Перезапустить локальный сервис\\n  ⌘⇧L   local logs            — Просмотр логов локального сервиса\\n  ⌘⇧5   local setup           — Настроить локальное окружение\\n\\n  ⌘⇧0   help: embeddings shortcuts  — Показать этот экран\\n\\nПодсказка: команды настраиваются в User Tasks и Keyboard Shortcuts (JSON)."
       ],
       "presentation": {
         "reveal": "always",
@@ -408,7 +408,7 @@ SEMAPHORE_VALUE = int(os.environ.get("SEMAPHORE_VALUE", "4"))  # По умолч
     "args": "local restart"
   },
   {
-    "key": "cmd+shift+4",
+    "key": "cmd+shift+l",
     "command": "workbench.action.tasks.runTask",
     "args": "local logs"
   },
@@ -440,7 +440,7 @@ SEMAPHORE_VALUE = int(os.environ.get("SEMAPHORE_VALUE", "4"))  # По умолч
 | `⌘ + ⇧ + 1`     | `local start`            | Запустить локальный embeddings сервис              |
 | `⌘ + ⇧ + 2`     | `local stop`             | Остановить локальный сервис                        |
 | `⌘ + ⇧ + 3`     | `local restart`          | Перезапустить локальный сервис                     |
-| `⌘ + ⇧ + 4`     | `local logs`             | Просмотр логов локального сервиса                  |
+| `⌘ + ⇧ + L`     | `local logs`             | Просмотр логов локального сервиса                  |
 | `⌘ + ⇧ + 5`     | `local setup`            | Настроить локальное окружение                      |
 
 #### Общие команды
